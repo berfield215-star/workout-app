@@ -40,6 +40,14 @@ html,body{height:100%;background:#f0f0f0;}
 .dc.today{background:var(--g200);color:#fff;font-weight:600;}
 .dc.dot::after{content:'';position:absolute;bottom:3px;width:5px;height:5px;border-radius:50%;background:var(--g400);}
 .dc.today.dot::after{background:#fff;}
+/* goal achieved: achieved1=1系統丸, achieved2=2系統花丸 */
+.dc.achieved1{box-shadow:0 0 0 2.5px var(--g400);font-weight:600;}
+.dc.today.achieved1{box-shadow:0 0 0 2.5px #fff;}
+.dc.achieved2{box-shadow:0 0 0 2.5px var(--g400);font-weight:600;}
+.dc.achieved2::before{content:'💮';position:absolute;top:-6px;right:-6px;font-size:12px;line-height:1;}
+.dc.today.achieved2{box-shadow:0 0 0 2.5px #fff;}
+.dc.achieved1.dot::after,.dc.achieved2.dot::after{background:var(--g600);}
+.dc.today.achieved1.dot::after,.dc.today.achieved2.dot::after{background:#fff;}
 .wsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px;}
 .sc{background:var(--mint);border-radius:12px;padding:10px 8px;text-align:center;}
 .sc .v{font-size:20px;font-weight:600;color:var(--g600);}
@@ -62,6 +70,11 @@ html,body{height:100%;background:#f0f0f0;}
 .cnt-inp{width:76px;height:44px;text-align:center;font-size:20px;font-weight:600;color:var(--txt);border:1.5px solid var(--bd);border-radius:10px;background:var(--bg);padding:0;}
 .cnt-inp:focus{outline:none;border-color:var(--g400);border-width:2px;}
 .cnt-inp.sp-inp:focus{border-color:var(--sp400);}
+.cnt-btn-sm{height:30px;padding:0 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg2);cursor:pointer;font-size:13px;font-weight:600;color:var(--g600);user-select:none;white-space:nowrap;}
+.cnt-btn-sm:active{background:var(--g50);}
+.cnt-btn-sm.sp-sm{color:var(--sp600);border-color:var(--sp400);}
+.cnt-btn-sm.sp-sm:active{background:var(--sp50);}
+.plus-row{display:flex;gap:6px;margin-top:6px;}
 .sp-note{background:var(--sp50);border:1px solid var(--sp400);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--sp600);line-height:1.7;}
 .sp-note strong{font-size:13px;display:block;margin-bottom:4px;}
 .auto-vals{background:var(--bg2);border-radius:8px;padding:7px 10px;margin-top:6px;font-size:12px;color:var(--txt2);}
@@ -119,6 +132,23 @@ html,body{height:100%;background:#f0f0f0;}
 .ged{font-size:14px;border:1px solid var(--g400);border-radius:8px;padding:5px 8px;background:var(--bg);color:var(--txt);min-width:0;flex:1;}
 .ged:focus{outline:none;}
 .slbl{font-size:12px;font-weight:600;color:var(--g600);margin:10px 0 4px;padding-left:8px;border-left:3px solid var(--g400);}
+/* goal card on calendar */
+.goal-bar{margin:0 10px 10px;display:flex;gap:8px;}
+.goal-card{flex:1;border-radius:10px;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd);}
+.goal-card.hit{background:#FFFDE7;border-color:#F9A825;}
+.goal-card .gc-lbl{font-size:10px;color:var(--txt2);margin-bottom:2px;}
+.goal-card .gc-val{font-size:13px;font-weight:600;color:var(--txt);}
+.goal-card.hit .gc-val{color:#E65100;}
+/* goal settings */
+.goal-sec{background:var(--mint);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.goal-sec-title{font-size:14px;font-weight:600;color:var(--g600);margin-bottom:10px;}
+.goal-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--bd);}
+.goal-row:last-child{border-bottom:none;}
+.goal-row-lbl{font-size:14px;color:var(--txt);}
+.goal-inp-wrap{display:flex;align-items:center;gap:6px;}
+.goal-inp{width:68px;height:34px;text-align:center;font-size:15px;font-weight:600;color:var(--txt);border:1px solid var(--bd);border-radius:8px;background:var(--bg);padding:0;}
+.goal-inp:focus{outline:none;border-color:var(--g400);}
+.goal-unit{font-size:13px;color:var(--txt2);}
 </style>
 </head>
 <body>
@@ -136,6 +166,7 @@ html,body{height:100%;background:#f0f0f0;}
     <div class="tab">統計</div>
     <div class="tab">記録</div>
     <div class="tab">種目設定</div>
+    <div class="tab">目標設定</div>
   </div>
   <div class="content">
     <div id="tab-calendar">
@@ -148,6 +179,7 @@ html,body{height:100%;background:#f0f0f0;}
         <div class="sc"><div class="v" id="sm">0</div><div class="l">今月合計</div></div>
         <div class="sc"><div class="v" id="sy">0</div><div class="l">年間合計</div></div>
       </div>
+      <div class="goal-bar" id="goal-bar"></div>
     </div>
     <div id="tab-stats" style="display:none"><div class="pg">
       <div class="stabs" id="stabs">
@@ -169,6 +201,7 @@ html,body{height:100%;background:#f0f0f0;}
       <div id="hist"></div>
     </div></div>
     <div id="tab-settings" style="display:none"><div class="pg" id="sbody"></div></div>
+    <div id="tab-goal" style="display:none"><div class="pg" id="gbody"></div></div>
   </div>
 </div>
 <div class="mbk" id="modal" style="display:none">
@@ -221,9 +254,11 @@ function ld(){
   }catch(e){}
   return{groups:JSON.parse(JSON.stringify(DEF)),data:{}};
 }
-function sv(){try{localStorage.setItem(SK,JSON.stringify({groups,data}));}catch(e){}}
+function sv(){try{localStorage.setItem(SK,JSON.stringify({groups,data,goals}));}catch(e){}}
 
-let{groups,data}=ld();
+let{groups,data,goals:_goals}=ld();
+// goals: {gid: number}  — per-group daily target
+let goals=_goals||{};
 
 // Ensure SP group exists
 if(!groups.find(g=>g.isSP))groups.push(JSON.parse(JSON.stringify(DEF[2])));
@@ -261,6 +296,29 @@ function applySP(spVal){
 /* CALENDAR */
 document.getElementById('pm').onclick=()=>{vm--;if(vm<0){vm=11;vy--;}renderCal();};
 document.getElementById('nm').onclick=()=>{vm++;if(vm>11){vm=0;vy++;}renderCal();};
+
+// Returns 0=未達成, 1=1系統達成, 2=全系統達成
+function achievedLevel(key){
+  const r=data[key];if(!r)return 0;
+  const activeGoals=groups.filter(g=>!g.isSP&&(goals[g.id]||0)>0);
+  if(!activeGoals.length)return 0;
+  const hitCount=activeGoals.filter(g=>{
+    const sum=g.items.reduce((s,e)=>s+(r[e.id]||0),0);
+    return sum>=(goals[g.id]||0);
+  }).length;
+  if(hitCount===0)return 0;
+  if(hitCount>=activeGoals.length)return 2;
+  return 1;
+}
+
+// Group totals for a given day key
+function groupTots(key){
+  const r=data[key]||{};
+  const res={};
+  groups.forEach(g=>{res[g.id]=g.items.reduce((s,e)=>s+(r[e.id]||0),0);});
+  return res;
+}
+
 function renderCal(){
   document.getElementById('mlbl').textContent=`${vy}年 ${MN[vm]}`;
   const first=new Date(vy,vm,1).getDay(),last=new Date(vy,vm+1,0).getDate();
@@ -269,10 +327,32 @@ function renderCal(){
   for(let i=0;i<first;i++){const p=new Date(vy,vm,0-first+i+1);const d=el('div','dc other');d.textContent=p.getDate();c.appendChild(d);}
   for(let d=1;d<=last;d++){
     const key=dk(vy,vm,d);
-    const div=el('div','dc'+(key===tk?' today':'')+(dtot(key)>0?' dot':''));
+    const lv=achievedLevel(key);
+    const achCls=lv===2?' achieved2':lv===1?' achieved1':'';
+    const cls='dc'+(key===tk?' today':'')+(dtot(key)>0?' dot':'')+achCls;
+    const div=el('div',cls);
     div.textContent=d;const _d=d;div.onclick=()=>openModal(vy,vm,_d);c.appendChild(div);
   }
   updateSum();
+  renderGoalBar();
+}
+
+function renderGoalBar(){
+  const bar=document.getElementById('goal-bar');bar.innerHTML='';
+  const tk=dk(now.getFullYear(),now.getMonth(),now.getDate());
+  const gt=groupTots(tk);
+  const targetGroups=groups.filter(g=>!g.isSP&&(goals[g.id]||0)>0);
+  if(!targetGroups.length)return;
+  targetGroups.forEach(g=>{
+    const target=goals[g.id]||0;
+    const actual=gt[g.id]||0;
+    const hit=actual>=target;
+    const card=el('div','goal-card'+(hit?' hit':''));
+    const lbl=el('div','gc-lbl');lbl.textContent=g.label+'（今日）';
+    const val=el('div','gc-val');
+    val.textContent=(hit?'💮 ':'')+actual+' / '+target+'回';
+    card.appendChild(lbl);card.appendChild(val);bar.appendChild(card);
+  });
 }
 function updateSum(){
   const y=now.getFullYear(),m=now.getMonth();
@@ -324,16 +404,22 @@ function buildModal(){
       const inp=el('input',ic);inp.type='number';inp.min='0';inp.inputMode='numeric';
       inp.value=mCounts[e.id]||0;inp.dataset.id=e.id;
       const bp=el('button',bc);bp.textContent='＋';
-      bm.onclick=()=>{
-        if(isSP){if((mCounts[SP_ID]||0)<=0)return;mCounts[SP_ID]--;applySP(mCounts[SP_ID]);refreshModal();}
-        else if(isMapped){mCounts['_b'+e.id]=Math.max(0,(mCounts['_b'+e.id]||0)-1);mCounts[e.id]=mCounts['_b'+e.id]+(mCounts[SP_ID]||0)*SP_MAP[e.id];inp.value=mCounts[e.id];updateAutoVal(e.id);}
-        else{mCounts[e.id]=Math.max(0,(mCounts[e.id]||0)-1);inp.value=mCounts[e.id];}
-      };
-      bp.onclick=()=>{
-        if(isSP){mCounts[SP_ID]=(mCounts[SP_ID]||0)+1;applySP(mCounts[SP_ID]);refreshModal();}
-        else if(isMapped){mCounts['_b'+e.id]=(mCounts['_b'+e.id]||0)+1;mCounts[e.id]=mCounts['_b'+e.id]+(mCounts[SP_ID]||0)*SP_MAP[e.id];inp.value=mCounts[e.id];updateAutoVal(e.id);}
-        else{mCounts[e.id]=(mCounts[e.id]||0)+1;inp.value=mCounts[e.id];}
-      };
+      // helper: add delta to an exercise count
+      function addDelta(delta){
+        if(isSP){
+          mCounts[SP_ID]=Math.max(0,(mCounts[SP_ID]||0)+delta);
+          applySP(mCounts[SP_ID]);refreshModal();
+        } else if(isMapped){
+          mCounts['_b'+e.id]=Math.max(0,(mCounts['_b'+e.id]||0)+delta);
+          mCounts[e.id]=mCounts['_b'+e.id]+(mCounts[SP_ID]||0)*SP_MAP[e.id];
+          inp.value=mCounts[e.id];updateAutoVal(e.id);
+        } else {
+          mCounts[e.id]=Math.max(0,(mCounts[e.id]||0)+delta);
+          inp.value=mCounts[e.id];
+        }
+      }
+      bm.onclick=()=>addDelta(-1);
+      bp.onclick=()=>addDelta(1);
       inp.oninput=()=>{
         const v=Math.max(0,parseInt(inp.value)||0);
         if(isSP){mCounts[SP_ID]=v;applySP(v);refreshModal();}
@@ -341,6 +427,15 @@ function buildModal(){
         else{mCounts[e.id]=v;}
       };
       ctrl.appendChild(bm);ctrl.appendChild(inp);ctrl.appendChild(bp);blk.appendChild(ctrl);
+      // +5 / +10 row
+      const pr=el('div','plus-row');
+      const smc=isSP?'cnt-btn-sm sp-sm':'cnt-btn-sm';
+      [5,10].forEach(n=>{
+        const b=el('button',smc);b.textContent='+'+n;
+        b.onclick=()=>addDelta(n);
+        pr.appendChild(b);
+      });
+      blk.appendChild(pr);
       if(isMapped){
         const av=el('div','auto-vals');av.id='av-'+e.id;
         const spV=mCounts[SP_ID]||0,bV=mCounts['_b'+e.id]||0;
@@ -381,12 +476,13 @@ document.getElementById('msave').onclick=()=>{
 
 /* TABS */
 let curTab='calendar';
-const TNAMES=['calendar','stats','records','settings'];
+const TNAMES=['calendar','stats','records','settings','goal'];
 document.querySelectorAll('#tabbar .tab').forEach((t,i)=>t.onclick=()=>{
   curTab=TNAMES[i];
   document.querySelectorAll('#tabbar .tab').forEach((x,j)=>x.classList.toggle('active',j===i));
   TNAMES.forEach(n=>document.getElementById('tab-'+n).style.display=n===curTab?'':'none');
-  if(curTab==='stats')renderStats();if(curTab==='records')renderRec();if(curTab==='settings')renderSet();
+  if(curTab==='stats')renderStats();if(curTab==='records')renderRec();
+  if(curTab==='settings')renderSet();if(curTab==='goal')renderGoal();
 });
 
 /* STATS */
@@ -415,27 +511,120 @@ function renderStats(){
 }
 
 /* RECORDS */
+// 各種目・各系統の「今日から遡って何日連続で記録があるか」を計算
+function calcStreak(filterFn){
+  // filterFn(key) → true なら「その日は達成」とみなす
+  const todayKey=dk(now.getFullYear(),now.getMonth(),now.getDate());
+  let streak=0;
+  let cursor=new Date(now);
+  while(true){
+    const key=dk(cursor.getFullYear(),cursor.getMonth(),cursor.getDate());
+    if(!filterFn(key))break;
+    streak++;
+    cursor.setDate(cursor.getDate()-1);
+    if(streak>3650)break; // 安全上限
+  }
+  return streak;
+}
+function streakLabel(n){
+  if(n<=0)return '';
+  if(n>=365){const y=Math.floor(n/365);return y+'年連続達成中！';}
+  if(n>=30){const m=Math.floor(n/30);return m+'か月連続達成中！';}
+  if(n>=7){const w=Math.floor(n/7);return w+'週間連続達成中！';}
+  return n+'日連続達成中！';
+}
+
 function renderRec(){
   const keys=Object.keys(data).sort();
-  if(!keys.length){document.getElementById('rbest').innerHTML='<div class="rt">1日の最高回数</div><div class="rv">記録なし</div>';document.getElementById('rstreak').innerHTML='<div class="rt">最長連続日数</div><div class="rv">記録なし</div>';document.getElementById('perex').innerHTML='';document.getElementById('hist').innerHTML='';return;}
+  if(!keys.length){
+    document.getElementById('rbest').innerHTML='<div class="rt">1日の最高回数</div><div class="rv">記録なし</div>';
+    document.getElementById('rstreak').innerHTML='<div class="rt">最長連続日数</div><div class="rv">記録なし</div>';
+    document.getElementById('perex').innerHTML='';document.getElementById('hist').innerHTML='';return;
+  }
+  // 全体ベスト
   let bd='',bv=0;keys.forEach(k=>{const t=dtot(k);if(t>bv){bv=t;bd=k;}});
   document.getElementById('rbest').innerHTML=`<div class="rt">1日の最高（全種目合計）</div><div class="rv">${bv}回</div><div class="rd">${bd}</div>`;
-  let ms=0,cur=0,prev=null;keys.forEach(k=>{if(prev){const df=(new Date(k)-new Date(prev))/86400000;cur=df===1?cur+1:1;}else cur=1;if(cur>ms)ms=cur;prev=k;});
+  // 最長連続
+  let ms=0,cur=0,prev=null;
+  keys.forEach(k=>{if(prev){const df=(new Date(k)-new Date(prev))/86400000;cur=df===1?cur+1:1;}else cur=1;if(cur>ms)ms=cur;prev=k;});
   document.getElementById('rstreak').innerHTML=`<div class="rt">最長連続トレーニング日数</div><div class="rv">${ms}日</div>`;
+
+  // 種目別ベスト
   const exB={};allEx().forEach(e=>exB[e.id]={val:0,day:''});
   keys.forEach(k=>{const r=data[k]||{};allEx().forEach(e=>{const v=r[e.id]||0;if(v>exB[e.id].val)exB[e.id]={val:v,day:k};});});
+
   const per=document.getElementById('perex');per.innerHTML='';
+
   groups.forEach(g=>{
-    const lbl=el('div','slbl');lbl.textContent=g.label;per.appendChild(lbl);
+    // 系統ヘッダー：系統名 + 系統の1日最高回数
+    const groupBest=keys.reduce((mx,k)=>{
+      const r=data[k]||{};
+      const s=g.items.reduce((ss,e)=>ss+(r[e.id]||0),0);
+      return s>mx?s:mx;
+    },0);
+
+    // 系統の連続達成（その日の系統合計が1以上）
+    const gStreak=calcStreak(key=>{
+      const r=data[key];if(!r)return false;
+      return g.items.some(e=>(r[e.id]||0)>0);
+    });
+    const gStreakLbl=streakLabel(gStreak);
+
+    // 系統ヘッダー行
+    const hdr=el('div');
+    hdr.style.cssText='display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px;padding-left:8px;border-left:3px solid var(--g400)';
+    const hl=el('div');
+    const htitle=el('div');
+    htitle.style.cssText='font-size:13px;font-weight:600;color:var(--g600)';
+    htitle.textContent=g.label;
+    hl.appendChild(htitle);
+    if(gStreakLbl){
+      const hs=el('div');
+      hs.style.cssText='font-size:11px;color:var(--sp600);font-weight:500;margin-top:1px';
+      hs.textContent='🔥 '+gStreakLbl;
+      hl.appendChild(hs);
+    }
+    const hv=el('div');
+    hv.style.cssText='text-align:right';
+    const hvlbl=el('div');hvlbl.style.cssText='font-size:10px;color:var(--txt2)';hvlbl.textContent='1日最高';
+    const hvval=el('div');hvval.style.cssText='font-size:16px;font-weight:600;color:var(--g600)';
+    hvval.textContent=groupBest>0?groupBest+'回':'—';
+    hv.appendChild(hvlbl);hv.appendChild(hvval);
+    hdr.appendChild(hl);hdr.appendChild(hv);
+    per.appendChild(hdr);
+
+    // 種目別行
     g.items.forEach(e=>{
-      const b=exB[e.id];const row=el('div','prw');
-      const lft=el('div');const n=el('div');n.style.cssText='font-size:14px;color:var(--txt)';n.textContent=e.name+(e.unit?`（${e.unit}）`:'');
-      const d2=el('div');d2.style.cssText='font-size:12px;color:var(--txt2)';d2.textContent=b.val>0?b.day:'—';
-      lft.appendChild(n);lft.appendChild(d2);
-      const vEl=el('div');vEl.style.cssText='font-size:16px;font-weight:600;color:var(--g600)';vEl.textContent=b.val>0?b.val+'回':'—';
-      row.appendChild(lft);row.appendChild(vEl);per.appendChild(row);
+      const b=exB[e.id];
+      // 種目連続達成（その日その種目が1以上）
+      const eStreak=calcStreak(key=>{
+        const r=data[key];if(!r)return false;
+        return(r[e.id]||0)>0;
+      });
+      const eStreakLbl=streakLabel(eStreak);
+
+      const row=el('div','prw');
+      const lft=el('div');lft.style.cssText='flex:1;min-width:0';
+      const nm=el('div');nm.style.cssText='font-size:14px;color:var(--txt)';
+      nm.textContent=e.name+(e.unit?`（${e.unit}）`:'');
+      lft.appendChild(nm);
+      if(eStreakLbl){
+        const sl=el('div');
+        sl.style.cssText='font-size:11px;color:var(--sp600);font-weight:500;margin-top:2px';
+        sl.textContent='🔥 '+eStreakLbl;
+        lft.appendChild(sl);
+      }
+      const right=el('div');right.style.cssText='text-align:right;flex-shrink:0;padding-left:8px';
+      const vEl=el('div');vEl.style.cssText='font-size:16px;font-weight:600;color:var(--g600)';
+      vEl.textContent=b.val>0?b.val+'回':'—';
+      const dEl=el('div');dEl.style.cssText='font-size:11px;color:var(--txt2)';
+      dEl.textContent=b.val>0?b.day:'';
+      right.appendChild(vEl);right.appendChild(dEl);
+      row.appendChild(lft);row.appendChild(right);
+      per.appendChild(row);
     });
   });
+
   document.getElementById('hist').innerHTML=keys.slice(-12).reverse().map(k=>`<div class="hrw"><span style="font-size:14px;color:var(--txt)">${k}</span><span style="font-size:14px;font-weight:600;color:var(--g600)">${dtot(k)}回</span></div>`).join('');
 }
 
@@ -502,6 +691,33 @@ function renderSet(){
   const nb=btn('追加','add-btn',()=>{const n=ni.value.trim();if(!n)return;groups.push({id:uid(),label:n,items:[]});sv();ni.value='';renderSet();});
   ni.onkeydown=ev=>{if(ev.key==='Enter')nb.click();};
   nr.appendChild(ni);nr.appendChild(nb);ng.appendChild(nl);ng.appendChild(nr);c.appendChild(ng);
+}
+
+/* GOAL SETTINGS */
+function renderGoal(){
+  const c=document.getElementById('gbody');c.innerHTML='';
+  const sec=el('div','goal-sec');
+  const ti=el('div','goal-sec-title');ti.textContent='系統ごとの1日の目標回数';
+  sec.appendChild(ti);
+  groups.filter(g=>!g.isSP).forEach(g=>{
+    const row=el('div','goal-row');
+    const lbl=el('div','goal-row-lbl');lbl.textContent=g.label;
+    const wrap=el('div','goal-inp-wrap');
+    const inp=el('input','goal-inp');
+    inp.type='number';inp.min='0';inp.inputMode='numeric';
+    inp.value=goals[g.id]||0;
+    const update=()=>{const v=Math.max(0,parseInt(inp.value)||0);goals[g.id]=v;sv();renderCal();};
+    inp.onchange=update;inp.oninput=update;
+    const unit=el('span','goal-unit');unit.textContent='回 / 日';
+    wrap.appendChild(inp);wrap.appendChild(unit);
+    row.appendChild(lbl);row.appendChild(wrap);
+    sec.appendChild(row);
+  });
+  c.appendChild(sec);
+  const note=el('div');
+  note.style.cssText='font-size:12px;color:var(--txt2);padding:0 2px;line-height:1.7';
+  note.innerHTML='目標を設定すると：<br>・カレンダーで全グループ達成日に ⭐ が表示されます<br>・今日の達成状況がカレンダー下に表示されます<br>・0 に設定すると目標なしになります';
+  c.appendChild(note);
 }
 
 renderCal();
